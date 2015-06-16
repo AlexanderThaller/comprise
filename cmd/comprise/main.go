@@ -24,7 +24,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/rpc"
 	"os"
@@ -49,5 +48,8 @@ func main() {
 		log.Fatal("can not register with server: ", err)
 	}
 
-	fmt.Printf("Client: %+v", client)
+	err = connection.Call("Server.UnRegisterClient", &client, nil)
+	if err != nil {
+		log.Fatal("can not unregister with server: ", err)
+	}
 }

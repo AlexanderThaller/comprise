@@ -1,6 +1,7 @@
 package comprise
 
 type Client struct {
-	ID   string
-	Name string
+	ID     string
+	Name   string
+	Secret []byte
 }

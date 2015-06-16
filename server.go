@@ -1,6 +1,8 @@
 package comprise
 
 import (
+	"bytes"
+	crand "crypto/rand"
 	"errors"
 	"log"
 	"math/rand"
@@ -33,7 +35,33 @@ func (server *Server) RegisterClient(name *string, reply *Client) error {
 	}
 	reply.ID = id
 
+	reply.Secret, err = getSecret(32)
+	if err != nil {
+		return err
+	}
+
 	server.addClient(reply)
+
+	return nil
+}
+
+func (server *Server) UnRegisterClient(client *Client, reply *struct{}) error {
+	secret, err := server.getSecret(client.ID)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Secret: ", secret)
+	log.Println("Remote Secret: ", client.Secret)
+
+	if !bytes.Equal(secret, client.Secret) {
+		return errors.New("wrong secret for client")
+	}
+
+	err = server.removeClient(client)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -79,6 +107,18 @@ func (server *Server) addClient(client *Client) error {
 	return nil
 }
 
+func (server *Server) removeClient(client *Client) error {
+	return errors.New("not implemented")
+}
+
+func (Server *Server) getClient(id string) (*Client, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (Server *Server) getSecret(id string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
+
 func randomId() (string, error) {
 	number := rand.Uint32()
 	id := formatNumberToID(number)
@@ -104,4 +144,14 @@ func formatNumberToID(number uint32) string {
 	}
 
 	return id
+}
+
+func getSecret(length int) ([]byte, error) {
+	secret := make([]byte, length)
+	_, err := crand.Read(secret)
+	if err != nil {
+		return nil, err
+	}
+
+	return secret, nil
 }
